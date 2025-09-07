@@ -1,0 +1,650 @@
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContentChat - AI-Powered Content Analysis Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                    chart: {
+                        "1": "var(--chart-1)",
+                        "2": "var(--chart-2)",
+                        "3": "var(--chart-3)",
+                        "4": "var(--chart-4)",
+                        "5": "var(--chart-5)",
+                    }
+                },
+                fontFamily: {
+                    sans: ["var(--font-sans)"],
+                    serif: ["var(--font-serif)"],
+                    mono: ["var(--font-mono)"],
+                }
+            },
+        }
+    };
+    </script>
+    <style>
+        :root {
+            --card: hsl(0, 0%, 100%);
+            --ring: hsl(240, 100%, 62.55%);
+            --input: hsl(0, 0%, 100%);
+            --muted: hsl(240 1.9608% 90%);
+            --accent: hsl(237.75, 75.47%, 79.22%);
+            --border: hsl(180, 12.9%, 87.84%);
+            --radius: 0.75rem;
+            --shadow: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --chart-1: hsl(240, 100%, 62.55%);
+            --chart-2: hsl(145.71, 52.99%, 49.22%);
+            --chart-3: hsl(43.25, 88.34%, 43.73%);
+            --chart-4: hsl(0, 73.71%, 41.76%);
+            --chart-5: hsl(220, 10.71%, 43.92%);
+            --popover: hsl(0 0% 100%);
+            --primary: hsl(240, 100%, 62.55%);
+            --sidebar: hsl(180 6.6667% 97.0588%);
+            --spacing: 0.25rem;
+            --font-mono: Menlo, monospace;
+            --font-sans: 'Inter', sans-serif;
+            --secondary: hsl(220, 42.86%, 97.25%);
+            --shadow-lg: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 4px 6px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --shadow-md: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 2px 4px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --shadow-sm: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --shadow-xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --background: hsl(0, 0%, 100%);
+            --font-serif: Georgia, serif;
+            --foreground: hsl(210, 25%, 7.84%);
+            --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --destructive: hsl(0, 73.71%, 41.76%);
+            --sidebar-ring: hsl(202.8169 89.1213% 53.1373%);
+            --sidebar-accent: hsl(211.5789 51.3514% 92.7451%);
+            --sidebar-border: hsl(205.0000 25.0000% 90.5882%);
+            --card-foreground: hsl(240, 10%, 15.69%);
+            --sidebar-primary: hsl(203.8863 88.2845% 53.1373%);
+            --tracking-normal: 0em;
+            --muted-foreground: hsl(210 25% 7.8431%);
+            --accent-foreground: hsl(137.14, 63.64%, 10.78%);
+            --popover-foreground: hsl(240, 10%, 15.69%);
+            --primary-foreground: hsl(0 0% 100%);
+            --sidebar-foreground: hsl(210 25% 7.8431%);
+            --secondary-foreground: hsl(240, 10%, 15.69%);
+            --destructive-foreground: hsl(0 0% 100%);
+            --sidebar-accent-foreground: hsl(203.8863 88.2845% 53.1373%);
+            --sidebar-primary-foreground: hsl(0 0% 100%);
+        }
+
+        .dark {
+            --card: hsl(228 9.8039% 10%);
+            --ring: hsl(202.8169 89.1213% 53.1373%);
+            --input: hsl(207.6923 27.6596% 18.4314%);
+            --muted: hsl(0 0% 9.4118%);
+            --accent: hsl(205.7143 70% 7.8431%);
+            --border: hsl(210 5.2632% 14.9020%);
+            --radius: 1.3rem;
+            --shadow: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --chart-1: hsl(203.8863 88.2845% 53.1373%);
+            --chart-2: hsl(159.7826 100% 36.0784%);
+            --chart-3: hsl(42.0290 92.8251% 56.2745%);
+            --chart-4: hsl(147.1429 78.5047% 41.9608%);
+            --chart-5: hsl(341.4894 75.2000% 50.9804%);
+            --popover: hsl(0 0% 0%);
+            --primary: hsl(203.7736 87.6033% 52.5490%);
+            --sidebar: hsl(228 9.8039% 10%);
+            --spacing: 0.25rem;
+            --font-mono: Menlo, monospace;
+            --font-sans: Open Sans, sans-serif;
+            --secondary: hsl(195.0000 15.3846% 94.9020%);
+            --shadow-lg: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 4px 6px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --shadow-md: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 2px 4px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --shadow-sm: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --shadow-xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --background: hsl(0 0% 0%);
+            --font-serif: Georgia, serif;
+            --foreground: hsl(200 6.6667% 91.1765%);
+            --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
+            --destructive: hsl(356.3033 90.5579% 54.3137%);
+            --sidebar-ring: hsl(202.8169 89.1213% 53.1373%);
+            --sidebar-accent: hsl(205.7143 70% 7.8431%);
+            --sidebar-border: hsl(205.7143 15.7895% 26.0784%);
+            --card-foreground: hsl(0 0% 85.0980%);
+            --sidebar-primary: hsl(202.8169 89.1213% 53.1373%);
+            --tracking-normal: 0em;
+            --muted-foreground: hsl(210 3.3898% 46.2745%);
+            --accent-foreground: hsl(203.7736 87.6033% 52.5490%);
+            --popover-foreground: hsl(200 6.6667% 91.1765%);
+            --primary-foreground: hsl(0 0% 100%);
+            --sidebar-foreground: hsl(0 0% 85.0980%);
+            --secondary-foreground: hsl(210 25% 7.8431%);
+            --destructive-foreground: hsl(0 0% 100%);
+            --sidebar-accent-foreground: hsl(203.7736 87.6033% 52.5490%);
+            --sidebar-primary-foreground: hsl(0 0% 100%);
+        }
+
+        .message-animation {
+            animation: messageSlideIn 0.3s ease-out;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .typing-indicator {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-mobile-hidden {
+                transform: translateX(-100%);
+            }
+        }
+
+        .chat-container {
+            height: calc(100vh - 80px);
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground font-sans">
+    <!-- @COMPONENT: MainLayout -->
+    <div class="flex h-screen overflow-hidden">
+        <!-- @COMPONENT: Sidebar -->
+        <div id="sidebar" class="w-80 bg-card border-r border-border flex flex-col sidebar-transition md:relative absolute inset-y-0 left-0 z-50">
+            <!-- Sidebar Header -->
+            <div class="p-6 border-b border-border">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-brain text-primary-foreground text-sm"></i>
+                        </div>
+                        <h1 class="text-lg font-semibold text-card-foreground">ContentChat</h1>
+                    </div>
+                    <button id="closeSidebar" class="md:hidden p-2 hover:bg-muted rounded-lg transition-colors">
+                        <i class="fas fa-times text-muted-foreground"></i>
+                    </button>
+                </div>
+                <p class="text-sm text-muted-foreground mt-2">AI-powered content analysis</p>
+            </div>
+
+            <!-- Add Data Source Section -->
+            <div class="p-6 border-b border-border">
+                <h2 class="text-sm font-medium text-card-foreground mb-4">Add Data Source</h2>
+                <form id="addSourceForm" class="space-y-4">
+                    <div>
+                        <input 
+                            type="url" 
+                            id="sourceUrl" 
+                            placeholder="Enter YouTube URL, webpage, or document link..."
+                            class="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+                            data-implementation="Should validate URL format and supported content types"
+                        />
+                    </div>
+                    <button 
+                        type="submit" 
+                        class="w-full bg-primary text-primary-foreground px-4 py-3 rounded-lg font-medium hover:bg-primary/90 focus:ring-2 focus:ring-ring transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        data-event="click:handleAddSource"
+                        data-implementation="Should extract content from URL and add to sources list"
+                    >
+                        <span id="addSourceText">Add Source</span>
+                        <i id="addSourceLoader" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Data Sources List -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-medium text-card-foreground">Data Sources</h2>
+                    <span class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full" data-bind="sources.length">3</span>
+                </div>
+
+                <!-- @MAP: sources.map(source => ( -->
+                <div class="space-y-3">
+                    <!-- Source Item 1 - YouTube Video -->
+                    <div class="bg-muted rounded-lg p-4 group hover:bg-accent transition-colors" data-mock="true">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <i class="fab fa-youtube text-red-500 text-sm"></i>
+                                    <span class="text-xs text-muted-foreground">YouTube</span>
+                                    <span class="text-xs bg-chart-2 text-white px-2 py-0.5 rounded-full">Ready</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-card-foreground truncate mb-1">
+                                    The Future of AI in Content Creation
+                                </h3>
+                                <p class="text-xs text-muted-foreground truncate">
+                                    youtube.com/watch?v=example123
+                                </p>
+                                <div class="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
+                                    <span>15 min transcript</span>
+                                    <span>•</span>
+                                    <span>2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <button class="p-2 hover:bg-destructive hover:text-destructive-foreground rounded-lg transition-colors opacity-0 group-hover:opacity-100" data-event="click:handleDeleteSource">
+                                    <i class="fas fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Source Item 2 - Web Article -->
+                    <div class="bg-muted rounded-lg p-4 group hover:bg-accent transition-colors" data-mock="true">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <i class="fas fa-globe text-blue-500 text-sm"></i>
+                                    <span class="text-xs text-muted-foreground">Web Article</span>
+                                    <span class="text-xs bg-chart-3 text-white px-2 py-0.5 rounded-full">Processing</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-card-foreground truncate mb-1">
+                                    Machine Learning Best Practices 2024
+                                </h3>
+                                <p class="text-xs text-muted-foreground truncate">
+                                    techblog.com/ml-best-practices-2024
+                                </p>
+                                <div class="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
+                                    <span>Extracting content...</span>
+                                    <span>•</span>
+                                    <span>5 min ago</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <button class="p-2 hover:bg-destructive hover:text-destructive-foreground rounded-lg transition-colors opacity-0 group-hover:opacity-100" data-event="click:handleDeleteSource">
+                                    <i class="fas fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Source Item 3 - PDF Document -->
+                    <div class="bg-muted rounded-lg p-4 group hover:bg-accent transition-colors" data-mock="true">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <i class="fas fa-file-pdf text-red-600 text-sm"></i>
+                                    <span class="text-xs text-muted-foreground">PDF</span>
+                                    <span class="text-xs bg-chart-2 text-white px-2 py-0.5 rounded-full">Ready</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-card-foreground truncate mb-1">
+                                    AI Research Paper - Transformers
+                                </h3>
+                                <p class="text-xs text-muted-foreground truncate">
+                                    research.pdf (2.3 MB)
+                                </p>
+                                <div class="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
+                                    <span>45 pages extracted</span>
+                                    <span>•</span>
+                                    <span>1 day ago</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <button class="p-2 hover:bg-destructive hover:text-destructive-foreground rounded-lg transition-colors opacity-0 group-hover:opacity-100" data-event="click:handleDeleteSource">
+                                    <i class="fas fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+
+                <!-- Empty State -->
+                <div id="emptyState" class="text-center py-8 hidden">
+                    <div class="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-plus text-muted-foreground text-xl"></i>
+                    </div>
+                    <p class="text-sm text-muted-foreground mb-2">No data sources yet</p>
+                    <p class="text-xs text-muted-foreground">Add a YouTube link, webpage, or document to get started</p>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: Sidebar -->
+
+        <!-- @COMPONENT: MainChatArea -->
+        <div class="flex-1 flex flex-col">
+            <!-- Top Bar -->
+            <div class="h-16 bg-card border-b border-border flex items-center justify-between px-6">
+                <div class="flex items-center space-x-4">
+                    <button id="toggleSidebar" class="md:hidden p-2 hover:bg-muted rounded-lg transition-colors">
+                        <i class="fas fa-bars text-muted-foreground"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-lg font-semibold text-card-foreground">Chat with your content</h1>
+                        <p class="text-sm text-muted-foreground">Ask questions about your added data sources</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button class="p-2 hover:bg-muted rounded-lg transition-colors" data-event="click:handleClearChat">
+                        <i class="fas fa-broom text-muted-foreground"></i>
+                    </button>
+                    <button class="p-2 hover:bg-muted rounded-lg transition-colors" data-event="click:handleSettings">
+                        <i class="fas fa-cog text-muted-foreground"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Messages Area -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide" id="chatMessages">
+                <!-- Welcome Message -->
+                <div class="flex items-start space-x-4" data-mock="true">
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-primary-foreground text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="bg-muted rounded-lg rounded-tl-none p-4">
+                            <p class="text-card-foreground text-sm leading-relaxed">
+                                Hello! I'm your AI assistant. I can help you analyze and extract insights from your uploaded content sources. 
+                                <br><br>
+                                You currently have <strong>3 data sources</strong> ready. Try asking me questions like:
+                                <br>
+                                • "Summarize the main points from the YouTube video"
+                                <br>
+                                • "What are the key takeaways from the ML article?"
+                                <br>
+                                • "Compare the insights from all sources"
+                            </p>
+                        </div>
+                        <div class="text-xs text-muted-foreground mt-2">AI Assistant • Just now</div>
+                    </div>
+                </div>
+
+                <!-- User Message Example -->
+                <div class="flex items-start space-x-4 justify-end" data-mock="true">
+                    <div class="flex-1 max-w-2xl">
+                        <div class="bg-primary rounded-lg rounded-tr-none p-4 ml-12">
+                            <p class="text-primary-foreground text-sm leading-relaxed">
+                                Can you summarize the key points from the YouTube video about AI in content creation?
+                            </p>
+                        </div>
+                        <div class="text-xs text-muted-foreground mt-2 text-right">You • 2 minutes ago</div>
+                    </div>
+                    <div class="w-8 h-8 bg-chart-4 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-user text-white text-sm"></i>
+                    </div>
+                </div>
+
+                <!-- AI Response Example -->
+                <div class="flex items-start space-x-4 message-animation" data-mock="true">
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-primary-foreground text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="bg-muted rounded-lg rounded-tl-none p-4">
+                            <div class="text-xs text-chart-1 mb-3 flex items-center">
+                                <i class="fab fa-youtube mr-2"></i>
+                                Source: The Future of AI in Content Creation
+                            </div>
+                            <p class="text-card-foreground text-sm leading-relaxed mb-4">
+                                Based on the YouTube video transcript, here are the key points about AI in content creation:
+                            </p>
+                            <ul class="space-y-2 text-sm text-card-foreground">
+                                <li class="flex items-start">
+                                    <span class="w-1.5 h-1.5 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                    <span><strong>Automation Revolution:</strong> AI is transforming how content is generated, from text to video, reducing production time by up to 70%</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="w-1.5 h-1.5 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                    <span><strong>Personalization at Scale:</strong> AI enables personalized content for millions of users simultaneously</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="w-1.5 h-1.5 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                    <span><strong>Creative Collaboration:</strong> AI serves as a creative partner rather than replacement, enhancing human creativity</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="w-1.5 h-1.5 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                    <span><strong>Quality Concerns:</strong> Need for human oversight to maintain authenticity and brand voice</span>
+                                </li>
+                            </ul>
+                            <div class="mt-4 p-3 bg-accent rounded-lg">
+                                <p class="text-xs text-accent-foreground">
+                                    💡 <strong>Key Insight:</strong> The video emphasizes that successful AI content creation requires a balance between automation and human creativity.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="text-xs text-muted-foreground mt-2">AI Assistant • 1 minute ago</div>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator (Hidden by default) -->
+                <div class="flex items-start space-x-4 hidden" id="typingIndicator">
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-primary-foreground text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="bg-muted rounded-lg rounded-tl-none p-4">
+                            <div class="flex items-center space-x-2 typing-indicator">
+                                <div class="w-2 h-2 bg-muted-foreground rounded-full"></div>
+                                <div class="w-2 h-2 bg-muted-foreground rounded-full animation-delay-200"></div>
+                                <div class="w-2 h-2 bg-muted-foreground rounded-full animation-delay-400"></div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-muted-foreground mt-2">AI is thinking...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input Area -->
+            <div class="border-t border-border p-6">
+                <form id="chatForm" class="space-y-4">
+                    <div class="flex space-x-4">
+                        <div class="flex-1 relative">
+                            <textarea
+                                id="chatInput"
+                                placeholder="Ask me anything about your content sources..."
+                                rows="1"
+                                class="w-full px-4 py-3 pr-12 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent transition-all resize-none min-h-[50px] max-h-32"
+                                data-implementation="Should auto-resize and handle enter key submission"
+                            ></textarea>
+                            <button
+                                type="submit"
+                                class="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 focus:ring-2 focus:ring-ring transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                data-event="click:handleSendMessage"
+                                data-implementation="Should send message and add to chat history"
+                            >
+                                <i class="fas fa-paper-plane text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-muted-foreground">
+                        <div class="flex items-center space-x-4">
+                            <span>Press Enter to send, Shift+Enter for new line</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span>3 sources available</span>
+                            <div class="w-2 h-2 bg-chart-2 rounded-full"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: MainChatArea -->
+    </div>
+    <!-- @END_COMPONENT: MainLayout -->
+
+    <!-- Mobile Overlay -->
+    <div id="mobileOverlay" class="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden hidden"></div>
+
+    <!-- @STATE: isOpen:boolean = false -->
+    <!-- @STATE: sources:array = [] -->
+    <!-- @STATE: messages:array = [] -->
+    <!-- @STATE: isTyping:boolean = false -->
+
+    <!-- @FUNCTIONALITY: This tool should implement content extraction using youtube-transcript-api for YouTube videos and web scraping for general URLs -->
+    <!-- @FUNCTIONALITY: Chat interface should use OpenAI API for intelligent responses based on extracted content -->
+    <!-- @FUNCTIONALITY: Should persist chat history during session and provide real-time feedback -->
+
+    <script>
+        // TODO: Implement business logic, API calls, and state management
+        (() => {
+            // Mobile sidebar toggle functionality
+            const sidebar = document.getElementById('sidebar');
+            const toggleSidebar = document.getElementById('toggleSidebar');
+            const closeSidebar = document.getElementById('closeSidebar');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+
+            function openSidebar() {
+                sidebar.classList.remove('sidebar-mobile-hidden');
+                mobileOverlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeSidebarFunc() {
+                sidebar.classList.add('sidebar-mobile-hidden');
+                mobileOverlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            toggleSidebar?.addEventListener('click', openSidebar);
+            closeSidebar?.addEventListener('click', closeSidebarFunc);
+            mobileOverlay?.addEventListener('click', closeSidebarFunc);
+
+            // Auto-resize textarea
+            const chatInput = document.getElementById('chatInput');
+            chatInput?.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 128) + 'px';
+            });
+
+            // Handle Enter key submission
+            chatInput?.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('chatForm')?.dispatchEvent(new Event('submit'));
+                }
+            });
+
+            // Form submissions with loading states
+            const addSourceForm = document.getElementById('addSourceForm');
+            const addSourceText = document.getElementById('addSourceText');
+            const addSourceLoader = document.getElementById('addSourceLoader');
+
+            addSourceForm?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const urlInput = document.getElementById('sourceUrl');
+                const url = urlInput.value.trim();
+                
+                if (!url) return;
+
+                // Show loading state
+                addSourceText.textContent = 'Adding...';
+                addSourceLoader.classList.remove('hidden');
+                
+                // TODO: Implement URL validation and content extraction
+                setTimeout(() => {
+                    addSourceText.textContent = 'Add Source';
+                    addSourceLoader.classList.add('hidden');
+                    urlInput.value = '';
+                    // TODO: Add new source to sidebar list
+                }, 2000);
+            });
+
+            const chatForm = document.getElementById('chatForm');
+            chatForm?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const input = document.getElementById('chatInput');
+                const message = input.value.trim();
+                
+                if (!message) return;
+                
+                // TODO: Add user message to chat
+                // TODO: Show typing indicator
+                // TODO: Send to AI API and display response
+                
+                input.value = '';
+                input.style.height = 'auto';
+            });
+
+            // Initialize mobile responsive behavior
+            function handleResize() {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('sidebar-mobile-hidden');
+                    mobileOverlay.classList.add('hidden');
+                    document.body.style.overflow = '';
+                } else {
+                    sidebar.classList.add('sidebar-mobile-hidden');
+                }
+            }
+
+            window.addEventListener('resize', handleResize);
+            handleResize(); // Initial call
+
+            // Auto-scroll chat to bottom
+            const chatMessages = document.getElementById('chatMessages');
+            function scrollToBottom() {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            scrollToBottom();
+        })();
+    </script>
+</body>
+</html>
