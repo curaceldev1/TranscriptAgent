@@ -45,10 +45,11 @@ export function SourceItem({ source, onDelete }: SourceItemProps) {
     }
   };
 
-  const formatTimeAgo = (date: Date | null) => {
+  const formatTimeAgo = (date: Date | string | null) => {
     if (!date) return "";
     const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const diffMs = now.getTime() - dateObj.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
