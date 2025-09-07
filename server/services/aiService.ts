@@ -69,7 +69,7 @@ Instructions:
         model: "gpt-5", // the newest OpenAI model is "gpt-5" which was released August 7, 2025
         messages,
         temperature: 0.7,
-        max_tokens: 1000,
+        max_completion_tokens: 1000,
       });
 
       const response = completion.choices[0]?.message?.content || "I apologize, but I couldn't generate a response.";
@@ -110,7 +110,7 @@ ${content}`
           }
         ],
         temperature: 0.5,
-        max_tokens: 500,
+        max_completion_tokens: 500,
       });
 
       return completion.choices[0]?.message?.content || "Summary generation failed.";
