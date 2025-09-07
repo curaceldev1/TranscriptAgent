@@ -37,33 +37,67 @@ export class ContentExtractor {
         throw new Error('Invalid YouTube URL');
       }
 
-      // Use youtube-transcript-api (would need to install via npm)
-      // For now, using yt-dlp as fallback which is more reliable
-      const command = `yt-dlp --write-auto-sub --skip-download --sub-lang en --sub-format vtt -o "%(title)s" "${url}"`;
+      // First, try to get video info and title
+      const infoCommand = `yt-dlp --print "%(title)s" "${url}"`;
+      let title = 'YouTube Video';
       
       try {
-        const { stdout } = await execAsync(command);
-        
-        // Extract title and transcript
-        const titleMatch = stdout.match(/^\[.*?\]\s+(.+?):/m);
-        const title = titleMatch ? titleMatch[1] : 'YouTube Video';
-        
-        // Read the generated subtitle file
-        const vttCommand = `find . -name "*.en.vtt" -exec cat {} \\; -exec rm {} \\;`;
-        const { stdout: vttContent } = await execAsync(vttCommand);
-        
-        // Clean VTT content to plain text
-        const content = this.cleanVTTContent(vttContent);
-        
-        return {
-          title,
-          content,
-          type: 'youtube'
-        };
-      } catch (dlError) {
-        // Fallback: try to use a simpler approach with youtube-dl
-        throw new Error('YouTube transcript extraction failed. Please ensure yt-dlp is installed.');
+        const { stdout: titleOutput } = await execAsync(infoCommand);
+        title = titleOutput.trim() || 'YouTube Video';
+      } catch (titleError) {
+        console.warn('Failed to get video title, using default');
       }
+
+      // Try to get subtitles with a simpler approach
+      const subsCommand = `yt-dlp --write-subs --sub-lang en --skip-download --sub-format vtt --output "/tmp/yt_%(id)s.%(ext)s" "${url}"`;
+      
+      try {
+        await execAsync(subsCommand);
+        
+        // Try to read the subtitle file
+        const vttFiles = await execAsync(`find /tmp -name "yt_${videoId}.en.vtt" -type f`);
+        
+        if (vttFiles.stdout.trim()) {
+          const vttFile = vttFiles.stdout.trim();
+          const { stdout: vttContent } = await execAsync(`cat "${vttFile}"`);
+          
+          // Clean up the file
+          await execAsync(`rm -f "${vttFile}"`);
+          
+          // Clean VTT content to plain text
+          const content = this.cleanVTTContent(vttContent);
+          
+          if (content.length > 50) { // Only accept if we got substantial content
+            return {
+              title,
+              content,
+              type: 'youtube'
+            };
+          }
+        }
+      } catch (subsError) {
+        console.warn('Subtitle extraction failed:', subsError);
+      }
+
+      // Fallback: extract description if no subtitles available
+      try {
+        const descCommand = `yt-dlp --print "%(description)s" "${url}"`;
+        const { stdout: description } = await execAsync(descCommand);
+        
+        if (description && description.trim().length > 50) {
+          return {
+            title,
+            content: description.trim().substring(0, 5000), // Limit description length
+            type: 'youtube'
+          };
+        }
+      } catch (descError) {
+        console.warn('Description extraction failed:', descError);
+      }
+
+      // If everything fails, return basic info
+      throw new Error('No transcript or description available for this video. Some videos may not have subtitles or accessible content.');
+      
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`YouTube extraction failed: ${errorMessage}`);
